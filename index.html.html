@@ -1,0 +1,1622 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Falcão Pizza - Menu Online (Admin OK)</title>
+  <style>
+    :root{
+      --bg:#0b0c10; --card:#12141b; --muted:#9aa4b2; --text:#e8eef7;
+      --brand:#b91c1c; --ok:#22c55e; --danger:#ef4444; --line:#23283b;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#07080c, #0b0c10);color:var(--text)}
+    .wrap{max-width:1150px;margin:0 auto;padding:18px}
+    .topbar{
+      display:flex;gap:12px;align-items:center;justify-content:space-between;
+      padding:14px 16px;background:rgba(18,20,27,.75);border:1px solid var(--line);
+      border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter: blur(8px);
+      position:sticky;top:10px;z-index:50;
+    }
+    .brand{display:flex;gap:10px;align-items:center}
+    .logo{
+      width:40px;height:40px;border-radius:12px;background:conic-gradient(from 180deg,var(--brand),#fb7185,#f97316);
+      box-shadow:0 8px 18px rgba(185,28,28,.25);
+    }
+    .brand h1{font-size:15px;margin:0;line-height:1.1}
+    .brand small{color:var(--muted)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tabbtn{
+      border:1px solid var(--line);background:transparent;color:var(--text);
+      padding:10px 12px;border-radius:14px;cursor:pointer;
+      display:flex;gap:8px;align-items:center;
+    }
+    .tabbtn.active{background:rgba(185,28,28,.18);border-color:rgba(185,28,28,.55)}
+    .grid{display:grid;gap:14px;margin-top:16px}
+    @media(min-width:920px){.grid{grid-template-columns: 1.25fr .75fr}}
+    .card{
+      background:rgba(18,20,27,.72);border:1px solid var(--line);
+      border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter: blur(8px);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:10px
+    }
+    .card .hd h2{margin:0;font-size:14px}
+    .card .bd{padding:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px}
+    label{font-size:12px;color:var(--muted)}
+    input,select,textarea{
+      background:#0f1118;border:1px solid var(--line);border-radius:14px;
+      color:var(--text);padding:11px 12px;outline:none;
+    }
+    textarea{min-height:92px;resize:vertical}
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);padding:11px 12px;border-radius:14px;cursor:pointer;
+      display:inline-flex;gap:8px;align-items:center;justify-content:center;
+      transition:.15s transform, .15s background;
+      user-select:none;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.05)}
+    .btn.primary{background:rgba(185,28,28,.22);border-color:rgba(185,28,28,.55)}
+    .btn.ok{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.45)}
+    .btn.danger{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.35)}
+    .btn.block{width:100%}
+    .muted{color:var(--muted)}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      padding:8px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(27,33,49,.7);cursor:pointer;font-size:13px;
+    }
+    .chip.active{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.12)}
+    .search{display:flex;gap:10px;align-items:center}
+    .search input{flex:1}
+    .prodgrid{display:grid;gap:12px}
+    @media(min-width:640px){.prodgrid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:980px){.prodgrid{grid-template-columns:repeat(3,1fr)}}
+    .prod{
+      border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(15,17,24,.72)
+    }
+    .prod .img{
+      height:120px;background:#0b0c10;display:flex;align-items:center;justify-content:center;
+      border-bottom:1px solid var(--line)
+    }
+    .prod .img img{width:100%;height:100%;object-fit:cover}
+    .prod .pbd{padding:12px}
+    .prod h3{margin:0 0 6px;font-size:14px}
+    .prod p{margin:0 0 10px;color:var(--muted);font-size:12.5px;min-height:36px}
+    .price{font-weight:900}
+    .badge{
+      font-size:11px;color:#cbd5e1;border:1px solid var(--line);background:rgba(255,255,255,.03);
+      padding:4px 8px;border-radius:999px
+    }
+    .hint{
+      border:1px dashed rgba(148,163,184,.35);
+      background:rgba(15,17,24,.45);padding:12px;border-radius:16px;color:var(--muted);font-size:12.5px
+    }
+    .divider{height:1px;background:var(--line);margin:12px 0}
+    .cartitems{display:flex;flex-direction:column;gap:10px}
+    .cartitem{
+      border:1px solid var(--line);border-radius:16px;padding:10px;background:rgba(15,17,24,.72)
+    }
+    .cartitem .top{display:flex;justify-content:space-between;gap:10px}
+    .cartitem b{font-size:13px}
+    .cartitem small{color:var(--muted)}
+    .qty{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .qty button{
+      width:34px;height:34px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.03);color:var(--text);cursor:pointer
+    }
+    .totalrow{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+    .footer{padding:12px 0 26px;color:var(--muted);font-size:12px;text-align:center}
+    .hidden{display:none!important}
+    .toast{
+      position:fixed;left:50%;transform:translateX(-50%);
+      bottom:18px;background:rgba(18,20,27,.92);border:1px solid var(--line);
+      padding:10px 12px;border-radius:14px;box-shadow:var(--shadow);display:none;z-index:90
+    }
+    .modalback{
+      position:fixed;inset:0;background:rgba(0,0,0,.6);
+      display:none;align-items:center;justify-content:center;z-index:100;
+      padding:16px;
+    }
+    .modal{
+      width:min(720px, 100%); background:rgba(18,20,27,.92);
+      border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow);
+      overflow:hidden; backdrop-filter: blur(10px);
+    }
+    .modal .mhd{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .modal .mhd h3{margin:0;font-size:14px}
+    .modal .mbd{padding:16px}
+    .optgrid{display:grid;gap:10px}
+    @media(min-width:700px){.optgrid{grid-template-columns:1fr 1fr}}
+    .pill{
+      border:1px solid var(--line);border-radius:14px;padding:10px;
+      background:rgba(15,17,24,.75);
+      display:flex;justify-content:space-between;gap:10px;align-items:center;cursor:pointer;
+    }
+    .pill.active{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.10)}
+    .pill.disabled{opacity:.5;cursor:not-allowed}
+    .mini{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" id="adminTrigger" aria-hidden="true"></div>
+        <div>
+          <h1 id="storeTitle">Falcão Pizza</h1>
+          <small id="storeSubtitle">Peça pelo link e envie no WhatsApp</small>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tabbtn active" data-tab="menu">🍕 Menu</button>
+        <button class="tabbtn" data-tab="cart">🛒 Carrinho <span class="badge" id="cartCount">0</span></button>
+</div>
+    </div>
+
+    <div id="tab-menu" class="grid">
+      <div class="card">
+        <div class="hd">
+          <h2>Produtos</h2>
+          <div class="search" style="min-width:260px">
+            <input id="q" placeholder="Buscar (ex.: calabresa, esfirra, coca...)" />
+          </div>
+        </div>
+        <div class="bd">
+          <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div class="chips" id="cats"></div>
+            <div class="mini" id="prodMeta"></div>
+          </div>
+          <div class="prodgrid" id="prodgrid"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <h2>Finalizar no WhatsApp</h2>
+          <span class="badge" id="openStatus">Aberto</span>
+        </div>
+        <div class="bd">
+          <div class="hint">
+            ✅ Monte seu pedido no menu. <br/>
+            ✅ Confira no carrinho. <br/>
+            ✅ Preencha seus dados e clique em <b>Enviar pedido</b>.
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>Seu nome</label>
+              <input id="c_name" placeholder="Ex.: Roberto" />
+            </div>
+            <div class="field">
+              <label>Telefone (opcional)</label>
+              <input id="c_phone" placeholder="Ex.: 85 9xxxx-xxxx" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>Entrega ou Retirada</label>
+              <select id="c_ship">
+                <option value="entrega">Entrega</option>
+                <option value="retirada">Retirada no balcão</option>
+              </select>
+            </div>
+            <div class="field" id="bairroWrap">
+              <label>Bairro (se entrega)</label>
+              <select id="c_bairro"></select>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:10px" id="addrWrap">
+            <label>Endereço (se entrega)</label>
+            <input id="c_address" placeholder="Rua, nº, bairro, referência..." />
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>Forma de pagamento</label>
+              <select id="c_pay">
+                <option>Pix</option>
+                <option>Dinheiro</option>
+                <option>Cartão</option>
+                <option>Na entrega</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Pedido mínimo (R$)</label>
+              <input id="minOrder" type="number" step="0.01" />
+              <span class="mini">configurável no Admin</span>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:10px">
+            <label>Observações gerais</label>
+            <textarea id="c_note" placeholder="Ex.: sem cebola, entregar na portaria, troco para R$ 50..."></textarea>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="hint" id="feeHint"></div>
+
+          <div class="divider"></div>
+
+          <div class="hint">
+            ➕ <b>Qualquer adicional:</b> R$ 4,00<br/>
+            🧀 <b>Borda recheada:</b> Cheddar R$ 3,00<br/>
+            ⚠️ <b>Todas as pizzas (M) não possuem borda recheada.</b><br/>
+            🍅 <b>Todas as pizzas têm molho de tomate.</b>
+          </div>
+
+          <div class="divider"></div>
+          <button class="btn ok block" id="sendWA">📲 Enviar pedido no WhatsApp</button>
+          <button class="btn block" id="openCart">🛒 Ver carrinho</button>
+
+          <div class="footer" id="openInfo"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-cart" class="grid hidden">
+      <div class="card">
+        <div class="hd">
+          <h2>Seu carrinho</h2>
+          <button class="btn danger" id="clearCart">🧹 Limpar</button>
+        </div>
+        <div class="bd">
+          <div id="cartEmpty" class="hint">Seu carrinho está vazio. Vá no menu e adicione itens 😊</div>
+          <div class="cartitems" id="cartitems"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd"><h2>Resumo</h2></div>
+        <div class="bd">
+          <div class="totalrow"><span class="muted">Subtotal</span><b id="subt">R$ 0,00</b></div>
+          <div class="totalrow"><span class="muted">Entrega</span><b id="fee">R$ 0,00</b></div>
+          <div class="divider"></div>
+          <div class="totalrow"><span class="muted">Total</span><b id="tot">R$ 0,00</b></div>
+          <div class="divider"></div>
+          <button class="btn ok block" id="sendWA2">📲 Enviar pedido no WhatsApp</button>
+          <button class="btn block" data-go="menu">🍕 Voltar ao menu</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-admin" class="grid hidden">
+      <div class="card">
+        <div class="hd">
+          <h2>Configurações</h2>
+          <button class="btn danger" id="resetAll">⚠️ Resetar tudo</button>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div class="field">
+              <label>Nome do estabelecimento</label>
+              <input id="a_title" />
+            </div>
+            <div class="field">
+              <label>Frase/descrição</label>
+              <input id="a_subtitle" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>WhatsApp (somente números com DDI 55)</label>
+              <input id="a_wa" />
+            </div>
+            <div class="field">
+              <label>Mensagem inicial no WhatsApp</label>
+              <input id="a_greet" placeholder="Ex.: Olá! Segue meu pedido:" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>Pedido mínimo (R$)</label>
+              <input id="a_min" type="number" step="0.01" />
+            </div>
+
+            <div class="field">
+              <label>Entrega: modo</label>
+              <select id="a_delMode">
+                <option value="fixed">Taxa fixa</option>
+                <option value="bairro">Taxa por bairro</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Taxa fixa (R$)</label>
+              <input id="a_delFixed" type="number" step="0.01" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row" style="align-items:flex-end">
+            <div class="field">
+              <label>Horário - abre</label>
+              <input id="a_open" type="time" />
+            </div>
+            <div class="field">
+              <label>Horário - fecha</label>
+              <input id="a_close" type="time" />
+            </div>
+            <div class="field">
+              <label>Aceitar pedidos fora do horário?</label>
+              <select id="a_allowClosed">
+                <option value="0">Não</option>
+                <option value="1">Sim</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <button class="btn primary" id="saveStore">💾 Salvar configurações</button>
+            <button class="btn" id="exportData">⬇️ Exportar backup</button>
+            <label class="btn" style="cursor:pointer">
+              ⬆️ Importar backup
+              <input id="importFile" type="file" accept="application/json" class="hidden">
+            </label>
+            <button class="btn" id="openClient">🔗 Abrir Menu do Cliente</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd"><h2>Bairros (taxa por bairro)</h2><span class="badge">opcional</span></div>
+        <div class="bd">
+          <div class="row">
+            <div class="field">
+              <label>Bairro</label>
+              <input id="b_name" placeholder="Ex.: Centro" />
+            </div>
+            <div class="field">
+              <label>Taxa (R$)</label>
+              <input id="b_fee" type="number" step="0.01" placeholder="Ex.: 5.00" />
+            </div>
+          </div>
+          <div class="divider"></div>
+          <button class="btn primary block" id="addBairro">➕ Adicionar bairro</button>
+          <div class="divider"></div>
+          <div id="b_list" class="hint"></div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <div class="hd"><h2>Produtos (Cadastrar / Editar)</h2><span class="badge" id="editBadge">Modo: Cadastro</span></div>
+        <div class="bd">
+          <div class="hint">
+            ✅ Agora o admin permite <b>editar</b> sem pop-ups.<br/>
+            Para editar: clique em <b>Editar</b> em um produto → altere no formulário → <b>Salvar alterações</b>.
+          </div>
+
+          <div class="divider"></div>
+
+          <input id="edit_id" class="hidden" />
+          <div class="row">
+            <div class="field">
+              <label>Tipo</label>
+              <select id="p_type">
+                <option value="pizza">Pizza</option>
+                <option value="outros">Esfirra/Outros</option>
+                <option value="bebida">Bebida</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Categoria</label>
+              <input id="p_cat" placeholder="Pizzas / Esfirras / Bebidas" />
+            </div>
+            <div class="field">
+              <label>Nome</label>
+              <input id="p_name" placeholder="Ex.: Calabresa" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field" style="flex:2">
+              <label>Descrição / Ingredientes</label>
+              <input id="p_desc" placeholder="Ex.: mussarela, calabresa, cebola..." />
+            </div>
+            <div class="field">
+              <label>Ordem</label>
+              <input id="p_sort" type="number" step="1" placeholder="10" />
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <select id="p_active">
+                <option value="1">Ativo</option>
+                <option value="0">Pausado</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div id="pricePizzaBox">
+            <div class="row">
+              <div class="field"><label>Preço P (R$)</label><input id="pp_p" type="number" step="0.01" placeholder="22.00"></div>
+              <div class="field"><label>Preço M (R$)</label><input id="pp_m" type="number" step="0.01" placeholder="28.00"></div>
+              <div class="field"><label>Preço G (R$)</label><input id="pp_g" type="number" step="0.01" placeholder="33.00"></div>
+              <div class="field"><label>Preço GG (R$)</label><input id="pp_gg" type="number" step="0.01" placeholder="48.00"></div>
+            </div>
+          </div>
+
+          <div id="priceOneBox" class="hidden">
+            <div class="row">
+              <div class="field">
+                <label>Preço único (R$)</label>
+                <input id="p_price" type="number" step="0.01" placeholder="3.00" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>Foto (opcional)</label>
+              <input id="p_img" type="file" accept="image/*" />
+              <span class="mini">Se não enviar, fica a foto genérica.</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <button class="btn primary" id="btnCreate">➕ Cadastrar</button>
+            <button class="btn ok hidden" id="btnSave">💾 Salvar alterações</button>
+            <button class="btn hidden" id="btnCancel">↩️ Cancelar edição</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="search" style="min-width:260px">
+            <input id="aq" placeholder="Buscar produtos..." />
+          </div>
+          <div class="divider"></div>
+          <div id="adminList" class="prodgrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalback" id="modalBack">
+    <div class="modal">
+      <div class="mhd">
+        <h3 id="m_title">Montar pizza</h3>
+        <button class="btn" id="m_close">✖</button>
+      </div>
+      <div class="mbd">
+        <div class="hint" id="m_desc"></div>
+        <div class="divider"></div>
+
+        <div class="optgrid">
+          <div>
+            <div class="mini">Tamanho</div>
+            <div id="m_sizes" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+          </div>
+          <div>
+            <div class="mini">Borda recheada</div>
+            <div id="m_crusts" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+            <div class="mini" id="m_crustNote" style="margin-top:6px"></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="optgrid">
+          <div>
+            <div class="mini">Adicionais</div>
+            <div id="m_extras" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+          </div>
+
+          <div>
+            <div class="mini">Pizza meio a meio (opcional)</div>
+            <select id="m_half" style="margin-top:8px;width:100%"></select>
+            <div class="mini" style="margin-top:6px">Regra: calcula pelo <b>maior valor</b> entre os sabores (no tamanho escolhido).</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div class="field">
+            <label>Quantidade</label>
+            <input id="m_qty" type="number" step="1" min="1" value="1" />
+          </div>
+          <div class="field">
+            <label>Observação do item</label>
+            <input id="m_note" placeholder="Ex.: sem cebola, bem assada..." />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div>
+            <div class="mini">Preço do item</div>
+            <div style="font-weight:900;font-size:18px" id="m_price">R$ 0,00</div>
+          </div>
+          <button class="btn ok" id="m_add">➕ Adicionar no carrinho</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const BRL = (v) => (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+  const el = (q) => document.querySelector(q);
+  const els = (q) => [...document.querySelectorAll(q)];
+  const escapeHtml = (s)=> String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const escapeAttr = (s)=> String(s||'').replace(/"/g,'&quot;');
+
+  const toast = (msg) => {
+    const t = el('#toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(toast._tm);
+    toast._tm = setTimeout(()=> t.style.display='none', 2300);
+  };
+
+  const KEY_V2 = 'FALCAO_PIZZA_MENU_V2_ADMIN_OK';
+  const KEY_V1 = 'FALCAO_PIZZA_MENU_V1';
+
+  const IMG = {
+    pizza: "https://commons.wikimedia.org/wiki/Special:FilePath/Pizza_Margherita_01.jpg",
+    esfirra: "https://commons.wikimedia.org/wiki/Special:FilePath/Sfiha_aberta.jpg",
+    soda: "https://commons.wikimedia.org/wiki/Special:FilePath/Sodas.JPG",
+    water: "https://commons.wikimedia.org/wiki/Special:FilePath/Polycarbonate%20water%20bottle.JPG",
+    juice: "https://commons.wikimedia.org/wiki/Special:FilePath/Orange_juice_1_edit1.jpg"
+  };
+  const guessImg = (p) => {
+    if(p.imgData) return p.imgData;
+    if(p.imgUrl) return p.imgUrl;
+    if(p.type==='pizza') return IMG.pizza;
+    const name = (p.name||'').toLowerCase();
+    if((p.cat||'').toLowerCase().includes('esfir')) return IMG.esfirra;
+    if(p.type==='bebida'){
+      if(name.includes('água') || name.includes('agua')) return IMG.water;
+      if(name.includes('suco')) return IMG.juice;
+      return IMG.soda;
+    }
+    return IMG.esfirra;
+  };
+
+  const defaults = {
+    store: {
+      title: 'Falcão Pizza',
+      subtitle: 'Peça pelo link e envie no WhatsApp',
+      wa: '5585986363689',
+      greet: 'Olá! Segue meu pedido:',
+      minOrder: 0,
+      delivery: { mode: 'fixed', fixedFee: 0, bairros: [{id:'b1', name:'Centro', fee: 5.00}] },
+      hours: { open: '18:00', close: '23:00', allowClosed: 1 }
+    },
+    pizza: {
+      sizes: [
+        {id:'P', name:'P', sort:10},
+        {id:'M', name:'M', sort:20},
+        {id:'G', name:'G', sort:30},
+        {id:'GG', name:'GG', sort:40},
+      ],
+      crusts: [
+        {id:'c0', name:'Sem borda', price: 0},
+        {id:'c_cheddar', name:'Cheddar', price: 3.00}
+      ]
+    },
+    extras: [
+      {id:'x_adic', name:'Adicional', price: 4.00, apply:'both'}
+    ],
+    products: [
+      { id:'pz_muss', type:'pizza', cat:'Pizzas', name:'Mussarela', desc:'Mussarela, tomate, orégano (com molho de tomate)', active:1, sort:10, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:28,G:33,GG:48} },
+      { id:'pz_cal', type:'pizza', cat:'Pizzas', name:'Calabresa', desc:'Mussarela, calabresa, cebola, orégano (com molho de tomate)', active:1, sort:20, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:28,G:33,GG:49} },
+      { id:'pz_mis', type:'pizza', cat:'Pizzas', name:'Mista', desc:'Mussarela, presunto, tomate, orégano (com molho de tomate)', active:1, sort:30, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:28,G:33,GG:49} },
+      { id:'pz_rom', type:'pizza', cat:'Pizzas', name:'Romana', desc:'Mussarela, presunto, calabresa, cebola, orégano (com molho de tomate)', active:1, sort:40, imgData:'', imgUrl:IMG.pizza, prices:{P:23,M:30,G:34,GG:50} },
+      { id:'pz_moda', type:'pizza', cat:'Pizzas', name:'Moda', desc:'Mussarela, frango, presunto, calabresa, ovos, tomate, cebola, orégano (com molho de tomate)', active:1, sort:50, imgData:'', imgUrl:IMG.pizza, prices:{P:25,M:33,G:36,GG:56} },
+      { id:'pz_bai', type:'pizza', cat:'Pizzas', name:'Baiana', desc:'Mussarela, calabresa, pimenta, cebola, orégano (com molho de tomate)', active:1, sort:60, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:28,G:33,GG:49} },
+      { id:'pz_fcb', type:'pizza', cat:'Pizzas', name:'Frango c/ Bacon', desc:'Mussarela, frango, bacon, cebola, orégano (com molho de tomate)', active:1, sort:70, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:32,G:35,GG:52} },
+      { id:'pz_fcc', type:'pizza', cat:'Pizzas', name:'Frango c/ Catupiry', desc:'Mussarela, frango, catupiry, tomate, orégano (com molho de tomate)', active:1, sort:80, imgData:'', imgUrl:IMG.pizza, prices:{P:24,M:32,G:35,GG:52} },
+      { id:'pz_cds', type:'pizza', cat:'Pizzas', name:'Carne do Sol', desc:'Mussarela, carne do sol, cebola, orégano (com molho de tomate)', active:1, sort:90, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:32,G:36,GG:53} },
+      { id:'pz_por', type:'pizza', cat:'Pizzas', name:'Portuguesa', desc:'Mussarela, frango, presunto, ovos, tomate, cebola, orégano (com molho de tomate)', active:1, sort:100, imgData:'', imgUrl:IMG.pizza, prices:{P:24,M:32,G:36,GG:54} },
+      { id:'pz_bas', type:'pizza', cat:'Pizzas', name:'Basca', desc:'Mussarela, calabresa, bacon, cebola, orégano (com molho de tomate)', active:1, sort:110, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:30,G:34,GG:50} },
+      { id:'pz_3q', type:'pizza', cat:'Pizzas', name:'3 Queijos', desc:'Mussarela, cheddar, catupiry, tomate, orégano (com molho de tomate)', active:1, sort:120, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:30,G:33,GG:50} },
+      { id:'pz_esp', type:'pizza', cat:'Pizzas', name:'Espanhola', desc:'Mussarela, frango, calabresa, bacon, cebola, orégano (com molho de tomate)', active:1, sort:130, imgData:'', imgUrl:IMG.pizza, prices:{P:24,M:32,G:35,GG:52} },
+      { id:'pz_mex', type:'pizza', cat:'Pizzas', name:'Mexicana', desc:'Mussarela, calabresa, bacon, ovos, pimenta, cebola, orégano (com molho de tomate)', active:1, sort:140, imgData:'', imgUrl:IMG.pizza, prices:{P:24,M:32,G:35,GG:52} },
+      { id:'pz_mar', type:'pizza', cat:'Pizzas', name:'Marguerita', desc:'Mussarela, manjericão, tomate (com molho de tomate)', active:1, sort:150, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:30,G:33,GG:49} },
+      { id:'pz_ame', type:'pizza', cat:'Pizzas', name:'Americana', desc:'Mussarela, bacon, ovos, cebola, orégano (com molho de tomate)', active:1, sort:160, imgData:'', imgUrl:IMG.pizza, prices:{P:24,M:30,G:33,GG:50} },
+      { id:'pz_bac', type:'pizza', cat:'Pizzas', name:'Bacon', desc:'Mussarela, bacon, cebola, orégano (com molho de tomate)', active:1, sort:170, imgData:'', imgUrl:IMG.pizza, prices:{P:22,M:30,G:33,GG:50} },
+      { id:'pz_nor', type:'pizza', cat:'Pizzas', name:'Nordestino', desc:'Mussarela, carne do sol, frango, cebola, orégano (com molho de tomate)', active:1, sort:180, imgData:'', imgUrl:IMG.pizza, prices:{P:24,M:33,G:36,GG:54} },
+      { id:'pz_fal', type:'pizza', cat:'Pizzas', name:'Falcão', desc:'Mussarela, carne do sol, frango, presunto, calabresa, bacon, ovos, tomate, cebola, orégano (com molho de tomate)', active:1, sort:190, imgData:'', imgUrl:IMG.pizza, prices:{P:25,M:35,G:38,GG:58} },
+
+      { id:'es_mus', type:'outros', cat:'Esfirras', name:'Esfirra Mussarela', desc:'', base: 3.00, active:1, sort:10, imgData:'', imgUrl:IMG.esfirra },
+      { id:'es_mis', type:'outros', cat:'Esfirras', name:'Esfirra Mista', desc:'', base: 3.00, active:1, sort:20, imgData:'', imgUrl:IMG.esfirra },
+      { id:'es_mar', type:'outros', cat:'Esfirras', name:'Esfirra Marguerita', desc:'', base: 3.00, active:1, sort:30, imgData:'', imgUrl:IMG.esfirra },
+      { id:'es_bac', type:'outros', cat:'Esfirras', name:'Esfirra Bacon', desc:'', base: 4.00, active:1, sort:40, imgData:'', imgUrl:IMG.esfirra },
+      { id:'es_3q', type:'outros', cat:'Esfirras', name:'Esfirra 3 Queijos', desc:'', base: 4.00, active:1, sort:50, imgData:'', imgUrl:IMG.esfirra },
+      { id:'es_fcat', type:'outros', cat:'Esfirras', name:'Esfirra Frango Catupiry', desc:'', base: 4.00, active:1, sort:60, imgData:'', imgUrl:IMG.esfirra },
+      { id:'es_fbac', type:'outros', cat:'Esfirras', name:'Esfirra Frango c/ Bacon', desc:'', base: 4.00, active:1, sort:70, imgData:'', imgUrl:IMG.esfirra },
+      { id:'es_cds', type:'outros', cat:'Esfirras', name:'Esfirra Carne do Sol', desc:'', base: 5.00, active:1, sort:80, imgData:'', imgUrl:IMG.esfirra },
+
+      { id:'bb_agua', type:'bebida', cat:'Bebidas', name:'Água', desc:'', base: 3.00, active:1, sort:10, imgData:'', imgUrl:IMG.water },
+      { id:'bb_suco', type:'bebida', cat:'Bebidas', name:'Suco 300ml', desc:'', base: 5.00, active:1, sort:20, imgData:'', imgUrl:IMG.juice },
+      { id:'bb_coca250', type:'bebida', cat:'Bebidas', name:'Coca-Cola 250ml', desc:'', base: 3.00, active:1, sort:30, imgData:'', imgUrl:IMG.soda },
+      { id:'bb_cocalata', type:'bebida', cat:'Bebidas', name:'Coca-Cola lata', desc:'', base: 5.00, active:1, sort:40, imgData:'', imgUrl:IMG.soda },
+      { id:'bb_coca1l', type:'bebida', cat:'Bebidas', name:'Coca-Cola 1L', desc:'', base: 11.00, active:1, sort:50, imgData:'', imgUrl:IMG.soda },
+      { id:'bb_gua1l', type:'bebida', cat:'Bebidas', name:'Guaraná 1L', desc:'', base: 11.00, active:1, sort:60, imgData:'', imgUrl:IMG.soda },
+      { id:'bb_sg', type:'bebida', cat:'Bebidas', name:'São Geraldo', desc:'', base: 11.00, active:1, sort:70, imgData:'', imgUrl:IMG.soda },
+    ],
+    cart: []
+  };
+
+  const normalizeLoaded = (data) => ({
+    store: { ...defaults.store, ...(data.store||{}),
+      delivery:{...defaults.store.delivery, ...(data.store?.delivery||{})},
+      hours:{...defaults.store.hours, ...(data.store?.hours||{})}
+    },
+    pizza: {
+      sizes: Array.isArray(data.pizza?.sizes)? data.pizza.sizes : structuredClone(defaults.pizza.sizes),
+      crusts: Array.isArray(data.pizza?.crusts)? data.pizza.crusts : structuredClone(defaults.pizza.crusts)
+    },
+    extras: Array.isArray(data.extras)? data.extras : structuredClone(defaults.extras),
+    products: Array.isArray(data.products)? data.products : structuredClone(defaults.products),
+    cart: Array.isArray(data.cart)? data.cart : []
+  });
+
+  const load = () => {
+    try{
+      const raw2 = localStorage.getItem(KEY_V2);
+      if(raw2){ return normalizeLoaded(JSON.parse(raw2)); }
+      const raw1 = localStorage.getItem(KEY_V1);
+      if(raw1){
+        const migrated = normalizeLoaded(JSON.parse(raw1));
+        localStorage.setItem(KEY_V2, JSON.stringify(migrated));
+        return migrated;
+      }
+      return structuredClone(defaults);
+    }catch(e){
+      return structuredClone(defaults);
+    }
+  };
+
+  let state = load();
+  const save = () => localStorage.setItem(KEY_V2, JSON.stringify(state));
+
+  const goTab = (tab) => {
+    const oldGoTab = goTab;
+
+  // === ADMIN INVISÍVEL (acesso secreto) ===
+  const ADMIN_PASS = "falcao8636";
+  const openAdminSecret = () => {
+    const pass = prompt("Senha do Admin:");
+    if(pass !== ADMIN_PASS) {
+      toast("Senha incorreta");
+      return;
+    }
+    oldGoTab('admin');
+    toast("Admin liberado ✅");
+  };
+
+  // Gatilho 1: segurar o logo por 2,5s
+  const trg = el('#adminTrigger');
+  if(trg){
+    let tmr = null;
+    const start = () => { tmr = setTimeout(openAdminSecret, 2500); };
+    const stop  = () => { if(tmr) clearTimeout(tmr); tmr = null; };
+    trg.addEventListener('mousedown', start);
+    trg.addEventListener('mouseup', stop);
+    trg.addEventListener('mouseleave', stop);
+    trg.addEventListener('touchstart', ()=>{ start(); }, {passive:true});
+    trg.addEventListener('touchend', stop);
+    trg.addEventListener('touchcancel', stop);
+  }
+
+  // Gatilho 2: tocar 7 vezes no título (fallback)
+  const titleEl = el('#storeTitle');
+  if(titleEl){
+    let taps = 0;
+    let last = 0;
+    titleEl.addEventListener('click', ()=>{
+      const now = Date.now();
+      if(now - last > 1200) taps = 0;
+      last = now;
+      taps++;
+      if(taps >= 7){ taps = 0; openAdminSecret(); }
+    });
+  }
+
+els('.tabbtn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+    el('#tab-menu').classList.toggle('hidden', tab!=='menu');
+    el('#tab-cart').classList.toggle('hidden', tab!=='cart');
+    el('#tab-admin').classList.toggle('hidden', tab!=='admin');
+    if(tab==='menu') renderMenu();
+    if(tab==='cart') renderCart();
+    if(tab==='admin') renderAdmin();
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  els('.tabbtn').forEach(b => b.addEventListener('click', ()=> goTab(b.dataset.tab)));
+  els('[data-go]').forEach(b => b.addEventListener('click', ()=> goTab(b.dataset.go)));
+  el('#openCart').addEventListener('click', ()=> goTab('cart'));
+
+  const nowMinutes = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
+  const toMinutes = (hhmm) => { const [h,m] = String(hhmm||'0:0').split(':').map(n=>Number(n)); return (h||0)*60 + (m||0); };
+  const isOpenNow = () => {
+    const o = toMinutes(state.store.hours.open);
+    const c = toMinutes(state.store.hours.close);
+    const n = nowMinutes();
+    return n >= o && n <= c;
+  };
+  const canSendNow = () => state.store.hours.allowClosed ? true : isOpenNow();
+
+  let activeCat = 'Todos';
+  const getCats = () => {
+    const cats = new Set(['Todos']);
+    state.products.forEach(p => { if(p.active) cats.add(p.cat || 'Outros'); });
+    return [...cats];
+  };
+  const filteredProducts = () => {
+    const q = (el('#q').value||'').trim().toLowerCase();
+    return state.products
+      .filter(p => p.active)
+      .filter(p => (activeCat==='Todos'? true : (p.cat||'Outros')===activeCat))
+      .filter(p => {
+        if(!q) return true;
+        const hay = `${p.name} ${p.desc} ${p.cat} ${p.type}`.toLowerCase();
+        return hay.includes(q);
+      })
+      .sort((a,b)=> (Number(a.sort||9999)-Number(b.sort||9999)) || a.name.localeCompare(b.name));
+  };
+
+  const cartCount = () => state.cart.reduce((acc,i)=> acc + (i.qty||0), 0);
+  const renderCartBadge = () => el('#cartCount').textContent = cartCount();
+  const getProduct = (id)=> state.products.find(p=>p.id===id);
+
+  const pizzaSizesSorted = () => [...state.pizza.sizes].sort((a,b)=> (a.sort||999)-(b.sort||999));
+  const getPizzaSizeCode = (sizeId) => {
+    const s = state.pizza.sizes.find(x=>x.id===sizeId) || pizzaSizesSorted()[1] || pizzaSizesSorted()[0];
+    return s?.id || 'M';
+  };
+
+  const lineUnitPrice = (item) => {
+    const p = getProduct(item.productId);
+    if(!p) return 0;
+    if(p.type !== 'pizza') return Number(p.base||0);
+
+    const sizeCode = getPizzaSizeCode(item.opts?.sizeId);
+    let price = Number(p.prices?.[sizeCode] ?? 0);
+
+    if(item.opts?.halfId){
+      const p2 = getProduct(item.opts.halfId);
+      if(p2 && p2.type==='pizza'){
+        const p2v = Number(p2.prices?.[sizeCode] ?? 0);
+        price = Math.max(price, p2v);
+      }
+    }
+
+    if(sizeCode !== 'M'){
+      const crust = state.pizza.crusts.find(x=>x.id===item.opts?.crustId);
+      price += Number(crust?.price||0);
+    }
+
+    const extraIds = item.opts?.extraIds || [];
+    for(const xid of extraIds){
+      const x = state.extras.find(e=>e.id===xid);
+      price += Number(x?.price||0);
+    }
+    return price;
+  };
+
+  const calcSubtotal = () => state.cart.reduce((s,it)=> s + lineUnitPrice(it)*(it.qty||1), 0);
+
+  const getSelectedBairroFee = () => {
+    const mode = state.store.delivery.mode;
+    if(mode==='fixed') return Number(state.store.delivery.fixedFee||0);
+    const id = el('#c_bairro')?.value;
+    const b = state.store.delivery.bairros.find(x=>x.id===id);
+    return Number(b?.fee||0);
+  };
+  const calcDeliveryFee = () => {
+    const ship = el('#c_ship')?.value || 'entrega';
+    if(ship==='retirada') return 0;
+    return getSelectedBairroFee();
+  };
+
+  const addCartItem = (productId, opts, qty, note) => {
+    state.cart.push({
+      key: uid(),
+      productId,
+      qty: Math.max(1, Number(qty||1)),
+      note: String(note||'').trim(),
+      opts: opts || {}
+    });
+    save();
+    renderCartBadge();
+    toast('Adicionado ao carrinho ✅');
+  };
+
+  const changeQty = (key, delta) => {
+    const it = state.cart.find(x=>x.key===key);
+    if(!it) return;
+    it.qty += delta;
+    if(it.qty<=0) state.cart = state.cart.filter(x=>x.key!==key);
+    save(); renderCart(); renderCartBadge();
+  };
+  const removeItem = (key) => { state.cart = state.cart.filter(x=>x.key!==key); save(); renderCart(); renderCartBadge(); };
+  const setItemNote = (key, note) => { const it=state.cart.find(x=>x.key===key); if(!it) return; it.note=note; save(); };
+
+  const syncDeliveryUI = () => {
+    el('#minOrder').value = Number(state.store.minOrder||0);
+    const sel = el('#c_bairro');
+    sel.innerHTML = '';
+    const bairros = state.store.delivery.bairros || [];
+    if(bairros.length===0){
+      sel.innerHTML = `<option value="">(Cadastre bairros no Admin)</option>`;
+    }else{
+      for(const b of bairros){
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.textContent = `${b.name} — ${BRL(Number(b.fee||0))}`;
+        sel.appendChild(opt);
+      }
+    }
+    const mode = state.store.delivery.mode;
+    el('#bairroWrap').classList.toggle('hidden', mode!=='bairro');
+    updateFeeHint();
+  };
+
+  const updateFeeHint = () => {
+    const ship = el('#c_ship').value;
+    const mode = state.store.delivery.mode;
+    if(ship==='retirada'){
+      el('#feeHint').textContent = `✅ Retirada no balcão — entrega: ${BRL(0)}`;
+      el('#addrWrap').classList.add('hidden');
+      el('#bairroWrap').classList.add('hidden');
+      return;
+    }
+    el('#addrWrap').classList.remove('hidden');
+    if(mode==='fixed'){
+      el('#bairroWrap').classList.add('hidden');
+      el('#feeHint').textContent = `🚚 Entrega (taxa fixa): ${BRL(Number(state.store.delivery.fixedFee||0))}`;
+    }else{
+      el('#bairroWrap').classList.remove('hidden');
+      el('#feeHint').textContent = `🚚 Entrega (por bairro): ${BRL(getSelectedBairroFee())}`;
+    }
+  };
+  el('#c_ship').addEventListener('change', updateFeeHint);
+  el('#c_bairro').addEventListener('change', updateFeeHint);
+
+  let modalProd = null;
+  let modalState = null;
+
+  const openModalFor = (p) => {
+    modalProd = p;
+    modalState = { sizeId: 'M', crustId: 'c0', extraIds: [], halfId: '', qty: 1, note: '' };
+
+    el('#m_title').textContent = `🍕 Montar Pizza: ${p.name}`;
+    el('#m_desc').innerHTML = `<b>${escapeHtml(p.name)}</b><br/><span class="mini">${escapeHtml(p.desc||'')}</span>`;
+
+    el('#m_sizes').innerHTML = '';
+    for(const s of pizzaSizesSorted()){
+      const price = p.prices?.[s.id];
+      const d = document.createElement('div');
+      d.className = 'pill' + (s.id===modalState.sizeId ? ' active' : '');
+      d.innerHTML = `<div><b>${escapeHtml(s.name)}</b></div><div class="mini">${price!=null?BRL(Number(price)):'—'}</div>`;
+      d.onclick = ()=> { modalState.sizeId = s.id; if(modalState.sizeId==='M') modalState.crustId='c0'; renderModal(); };
+      el('#m_sizes').appendChild(d);
+    }
+
+    el('#m_crusts').innerHTML = '';
+    for(const c of state.pizza.crusts){
+      const disabled = (modalState.sizeId==='M' && c.id!=='c0');
+      const d = document.createElement('div');
+      d.className = 'pill' + (c.id===modalState.crustId ? ' active' : '') + (disabled ? ' disabled' : '');
+      d.innerHTML = `<div><b>${escapeHtml(c.name)}</b></div><div class="mini">${BRL(Number(c.price||0))}</div>`;
+      d.onclick = ()=> { if(disabled) return; modalState.crustId = c.id; renderModal(); };
+      el('#m_crusts').appendChild(d);
+    }
+
+    el('#m_extras').innerHTML = '';
+    for(const x of state.extras){
+      const d = document.createElement('div');
+      d.className = 'pill' + (modalState.extraIds.includes(x.id) ? ' active' : '');
+      d.innerHTML = `<div><b>${escapeHtml(x.name)}</b></div><div class="mini">${BRL(Number(x.price||0))}</div>`;
+      d.onclick = ()=> {
+        if(modalState.extraIds.includes(x.id)) modalState.extraIds = modalState.extraIds.filter(i=>i!==x.id);
+        else modalState.extraIds.push(x.id);
+        renderModal();
+      };
+      el('#m_extras').appendChild(d);
+    }
+
+    el('#m_half').innerHTML = '';
+    const pizzas = state.products.filter(x=>x.active && x.type==='pizza');
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = '(Sem meio a meio)';
+    el('#m_half').appendChild(first);
+    for(const pz of pizzas){
+      if(pz.id===p.id) continue;
+      const opt = document.createElement('option');
+      opt.value = pz.id;
+      opt.textContent = `Meio: ${pz.name}`;
+      el('#m_half').appendChild(opt);
+    }
+    el('#m_half').value = '';
+    el('#m_half').onchange = ()=> { modalState.halfId = el('#m_half').value; renderModal(); };
+
+    el('#m_qty').value = 1;
+    el('#m_note').value = '';
+    el('#m_qty').oninput = ()=> { modalState.qty = Number(el('#m_qty').value||1); renderModal(); };
+    el('#m_note').oninput = ()=> { modalState.note = el('#m_note').value; };
+
+    renderModal();
+    el('#modalBack').style.display='flex';
+  };
+
+  const renderModal = () => {
+    el('#m_crustNote').textContent = modalState.sizeId==='M'
+      ? '⚠️ Tamanho M não aceita borda recheada.'
+      : '✅ Borda disponível no tamanho selecionado.';
+
+    const tempItem = { productId: modalProd.id, qty: 1, note: modalState.note,
+      opts: { sizeId: modalState.sizeId, crustId: modalState.crustId, extraIds: modalState.extraIds, halfId: modalState.halfId || '' } };
+    el('#m_price').textContent = BRL(lineUnitPrice(tempItem));
+  };
+
+  el('#m_close').addEventListener('click', ()=> el('#modalBack').style.display='none');
+  el('#modalBack').addEventListener('click', (ev)=> { if(ev.target.id==='modalBack') el('#modalBack').style.display='none'; });
+  el('#m_add').addEventListener('click', ()=> {
+    if(!modalProd) return;
+    const qty = Math.max(1, Number(el('#m_qty').value||1));
+    const note = (el('#m_note').value||'').trim();
+    const opts = { sizeId: modalState.sizeId, crustId: modalState.crustId, extraIds: modalState.extraIds, halfId: modalState.halfId || '' };
+    if(opts.sizeId==='M') opts.crustId='c0';
+    addCartItem(modalProd.id, opts, qty, note);
+    el('#modalBack').style.display='none';
+  });
+
+  const buildMessage = () => {
+    const name = (el('#c_name').value||'').trim();
+    const phone = (el('#c_phone').value||'').trim();
+    const ship = el('#c_ship').value;
+    const bairroId = el('#c_bairro').value;
+    const bairro = state.store.delivery.bairros.find(b=>b.id===bairroId);
+    const address = (el('#c_address').value||'').trim();
+    const pay = (el('#c_pay').value||'').trim();
+    const note = (el('#c_note').value||'').trim();
+
+    const items = state.cart.map(it => {
+      const p = getProduct(it.productId);
+      if(!p) return null;
+      const unit = lineUnitPrice(it);
+      const line = `• ${p.name} — ${it.qty}x (${BRL(unit)})`;
+
+      let details = [];
+      if(p.type==='pizza'){
+        const sizeCode = getPizzaSizeCode(it.opts?.sizeId);
+        details.push(`Tamanho: ${sizeCode}`);
+        if(it.opts?.halfId){
+          const p2 = getProduct(it.opts.halfId);
+          if(p2) details.push(`Meio a meio: ${p.name} + ${p2.name}`);
+        }
+        if(sizeCode !== 'M'){
+          const crust = state.pizza.crusts.find(x=>x.id===it.opts?.crustId);
+          if(crust && Number(crust.price||0)>0) details.push(`Borda: ${crust.name}`);
+        } else {
+          details.push('Borda: (não disponível no M)');
+        }
+      }
+      const extraIds = it.opts?.extraIds || [];
+      if(extraIds.length){
+        const names = extraIds.map(id=> state.extras.find(x=>x.id===id)?.name).filter(Boolean);
+        if(names.length) details.push(`Adicionais: ${names.join(', ')}`);
+      }
+      if(it.note) details.push(`Obs: ${it.note}`);
+      const detailText = details.length ? `\n   ${details.join(' • ')}` : '';
+      return `${line}${detailText}`;
+    }).filter(Boolean);
+
+    const sub = calcSubtotal();
+    const fee = ship==='retirada' ? 0 : calcDeliveryFee();
+    const tot = sub + fee;
+
+    const greet = (state.store.greet||'').trim();
+    const lines = [];
+    if(greet) lines.push(greet);
+    lines.push('');
+    lines.push('🛒 *NOVO PEDIDO*');
+    if(name) lines.push(`👤 Cliente: ${name}`);
+    if(phone) lines.push(`📞 Telefone: ${phone}`);
+    lines.push(`🚩 Tipo: ${ship==='retirada' ? 'Retirada no balcão' : 'Entrega'}`);
+    if(ship==='entrega'){
+      if(state.store.delivery.mode==='bairro' && bairro) lines.push(`🏘 Bairro: ${bairro.name} (${BRL(Number(bairro.fee||0))})`);
+      if(address) lines.push(`📍 Endereço: ${address}`);
+    }
+    if(pay) lines.push(`💳 Pagamento: ${pay}`);
+    lines.push('');
+    lines.push('*Itens:*');
+    lines.push(items.length ? items.join('\n') : '(sem itens)');
+    lines.push('');
+    lines.push(`Subtotal: ${BRL(sub)}`);
+    lines.push(`Entrega: ${BRL(fee)}`);
+    lines.push(`*Total: ${BRL(tot)}*`);
+    if(note) { lines.push(''); lines.push(`📝 Obs geral: ${note}`); }
+    lines.push('');
+    lines.push('Enviado pelo Menu Online ✅');
+    return lines.join('\n');
+  };
+
+  const sendToWhatsApp = () => {
+    if(state.cart.length===0) return toast('Seu carrinho está vazio 😅');
+    if(!canSendNow()) return toast('Fora do horário agora. Configure no Admin se quiser aceitar mesmo assim.');
+
+    const min = Number(state.store.minOrder||0);
+    const sub = calcSubtotal();
+    if(min>0 && sub < min) return toast(`Pedido mínimo é ${BRL(min)}. Subtotal atual: ${BRL(sub)}`);
+
+    const ship = el('#c_ship').value;
+    if(ship==='entrega'){
+      const addr = (el('#c_address').value||'').trim();
+      if(!addr) return toast('Informe o endereço para entrega.');
+      if(state.store.delivery.mode==='bairro'){
+        const bid = el('#c_bairro').value;
+        if(!bid) return toast('Selecione o bairro.');
+      }
+    }
+
+    const wa = String(state.store.wa||'').replace(/\D/g,'');
+    if(!wa) return toast('Configure o WhatsApp no Admin.');
+
+    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(buildMessage())}`, '_blank');
+  };
+
+  el('#sendWA').addEventListener('click', sendToWhatsApp);
+  el('#sendWA2').addEventListener('click', sendToWhatsApp);
+
+  const syncHeader = () => {
+    el('#storeTitle').textContent = state.store.title || defaults.store.title;
+    el('#storeSubtitle').textContent = state.store.subtitle || defaults.store.subtitle;
+
+    const open = canSendNow();
+    el('#openStatus').textContent = open ? 'Aberto' : 'Fechado';
+    el('#openStatus').style.borderColor = open ? 'rgba(34,197,94,.45)' : 'rgba(239,68,68,.35)';
+    el('#openStatus').style.background = open ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+    el('#openInfo').textContent = `Horário: ${state.store.hours.open} às ${state.store.hours.close} • ${open ? 'aceitando pedidos' : 'fora do horário'}`;
+  };
+
+  const renderCats = () => {
+    const cats = getCats();
+    const box = el('#cats');
+    box.innerHTML = '';
+    for(const c of cats){
+      const b = document.createElement('div');
+      b.className = 'chip' + (c===activeCat ? ' active' : '');
+      b.textContent = c;
+      b.onclick = () => { activeCat = c; renderMenu(); };
+      box.appendChild(b);
+    }
+  };
+
+  const renderMenu = () => {
+    syncHeader();
+    renderCats();
+    syncDeliveryUI();
+    renderCartBadge();
+
+    const list = filteredProducts();
+    el('#prodMeta').textContent = `${list.length} item(ns)`;
+    const grid = el('#prodgrid');
+    grid.innerHTML = '';
+
+    if(list.length===0){
+      grid.innerHTML = `<div class="hint" style="grid-column:1/-1">Nenhum produto encontrado.</div>`;
+      return;
+    }
+
+    for(const p of list){
+      const card = document.createElement('div');
+      card.className = 'prod';
+
+      let priceBlock = '';
+      if(p.type==='pizza'){
+        const pr = p.prices || {};
+        priceBlock = `<div class="mini">P ${BRL(pr.P||0)} • M ${BRL(pr.M||0)} • G ${BRL(pr.G||0)} • GG ${BRL(pr.GG||0)}</div>`;
+      } else {
+        priceBlock = `<div class="price">${BRL(Number(p.base||0))}</div>`;
+      }
+
+      card.innerHTML = `
+        <div class="img"><img alt="${escapeAttr(p.name)}" src="${escapeAttr(guessImg(p))}"></div>
+        <div class="pbd">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+            <div>
+              <h3>${escapeHtml(p.name)}</h3>
+              <div class="mini">${escapeHtml(p.cat || 'Outros')}</div>
+              ${p.type==='pizza' ? priceBlock : ''}
+            </div>
+            ${p.type!=='pizza' ? priceBlock : `<span class="badge">Pizza</span>`}
+          </div>
+          <p>${escapeHtml(p.desc||'')}</p>
+          <div class="row">
+            <button class="btn primary" data-main="${p.id}">${p.type==='pizza' ? '🧩 Montar' : '➕ Adicionar'}</button>
+            ${p.type!=='pizza' ? `<button class="btn" data-note="${p.id}">✍️ Obs</button>` : ``}
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+
+    grid.querySelectorAll('[data-main]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.getAttribute('data-main');
+        const p = state.products.find(x=>x.id===id);
+        if(!p) return;
+        if(p.type==='pizza') openModalFor(p);
+        else addCartItem(p.id, {}, 1, '');
+      });
+    });
+
+    grid.querySelectorAll('[data-note]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.getAttribute('data-note');
+        const p = state.products.find(x=>x.id===id);
+        if(!p) return;
+        const note = prompt(`Observação para "${p.name}":`, '');
+        if(note===null) return;
+        addCartItem(p.id, {}, 1, note);
+      });
+    });
+  };
+
+  el('#q').addEventListener('input', renderMenu);
+
+  const renderCart = () => {
+    syncHeader();
+    syncDeliveryUI();
+    renderCartBadge();
+
+    const itemsBox = el('#cartitems');
+    const empty = el('#cartEmpty');
+    itemsBox.innerHTML = '';
+
+    if(state.cart.length===0){
+      empty.classList.remove('hidden');
+    } else {
+      empty.classList.add('hidden');
+      for(const it of state.cart){
+        const p = getProduct(it.productId);
+        if(!p) continue;
+        const unit = lineUnitPrice(it);
+        const lineTotal = unit * (it.qty||1);
+
+        let details = [];
+        if(p.type==='pizza'){
+          const sizeCode = getPizzaSizeCode(it.opts?.sizeId);
+          details.push(`Tamanho: ${sizeCode}`);
+          if(it.opts?.halfId){
+            const p2 = getProduct(it.opts.halfId);
+            if(p2) details.push(`Meio a meio: ${p.name} + ${p2.name}`);
+          }
+          if(sizeCode !== 'M'){
+            const crust = state.pizza.crusts.find(x=>x.id===it.opts?.crustId);
+            if(crust && Number(crust.price||0)>0) details.push(`Borda: ${crust.name}`);
+          }
+        }
+        const extraIds = it.opts?.extraIds || [];
+        if(extraIds.length){
+          const names = extraIds.map(id=> state.extras.find(x=>x.id===id)?.name).filter(Boolean);
+          if(names.length) details.push(`Adicionais: ${names.join(', ')}`);
+        }
+        const detailText = details.length ? details.join(' • ') : '';
+
+        const div = document.createElement('div');
+        div.className = 'cartitem';
+        div.innerHTML = `
+          <div class="top">
+            <div>
+              <b>${escapeHtml(p.name)}</b><br/>
+              <small>${escapeHtml(p.cat||'Outros')} • ${BRL(unit)} cada</small>
+              ${detailText ? `<div class="mini" style="margin-top:6px">${escapeHtml(detailText)}</div>` : ``}
+            </div>
+            <div style="text-align:right">
+              <b>${BRL(lineTotal)}</b><br/>
+              <button class="btn danger" style="padding:8px 10px;border-radius:12px;margin-top:6px" data-rm="${it.key}">Remover</button>
+            </div>
+          </div>
+
+          <div class="qty">
+            <button data-q="${it.key}" data-d="-1">−</button>
+            <span><b>${it.qty}</b></span>
+            <button data-q="${it.key}" data-d="1">+</button>
+            <span class="mini" style="margin-left:auto">Obs:</span>
+          </div>
+          <input style="margin-top:8px;width:100%" placeholder="Observação do item..." value="${escapeAttr(it.note||'')}" data-noteinp="${it.key}" />
+        `;
+        itemsBox.appendChild(div);
+      }
+    }
+
+    itemsBox.querySelectorAll('[data-rm]').forEach(b=> b.addEventListener('click', ()=> removeItem(b.getAttribute('data-rm'))));
+    itemsBox.querySelectorAll('[data-q]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const key = b.getAttribute('data-q');
+        const d = Number(b.getAttribute('data-d'));
+        changeQty(key, d);
+      });
+    });
+    itemsBox.querySelectorAll('[data-noteinp]').forEach(inp=>{
+      inp.addEventListener('input', ()=> setItemNote(inp.getAttribute('data-noteinp'), inp.value));
+    });
+
+    el('#subt').textContent = BRL(calcSubtotal());
+    el('#fee').textContent = BRL(calcDeliveryFee());
+    el('#tot').textContent = BRL(calcSubtotal() + calcDeliveryFee());
+  };
+
+  el('#clearCart').addEventListener('click', ()=>{
+    state.cart = [];
+    save();
+    renderCart();
+    toast('Carrinho limpo ✅');
+  });
+
+  const renderBairros = () => {
+    const b = state.store.delivery.bairros || [];
+    el('#b_list').innerHTML = b.length
+      ? b.map(x=>`• <b>${escapeHtml(x.name)}</b> — ${BRL(Number(x.fee||0))} <button class="btn danger" style="padding:6px 8px;border-radius:12px;margin-left:8px" data-bdel="${x.id}">Excluir</button>`).join('<br/>')
+      : 'Nenhum bairro cadastrado.';
+
+    els('[data-bdel]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute('data-bdel');
+        state.store.delivery.bairros = state.store.delivery.bairros.filter(x=>x.id!==id);
+        save(); renderBairros(); syncDeliveryUI();
+      };
+    });
+  };
+
+  let editingId = '';
+
+  const syncPriceBoxes = () => {
+    const type = el('#p_type').value;
+    el('#pricePizzaBox').classList.toggle('hidden', type!=='pizza');
+    el('#priceOneBox').classList.toggle('hidden', type==='pizza');
+    if(!el('#p_cat').value.trim()){
+      el('#p_cat').value = (type==='pizza') ? 'Pizzas' : (type==='bebida') ? 'Bebidas' : 'Esfirras';
+    }
+  };
+  el('#p_type').addEventListener('change', syncPriceBoxes);
+
+  function fileToDataURL(file){
+    return new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=> resolve(String(r.result||''));
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  const resetForm = () => {
+    editingId = '';
+    el('#edit_id').value = '';
+    el('#editBadge').textContent = 'Modo: Cadastro';
+    el('#p_type').value = 'pizza';
+    el('#p_cat').value = 'Pizzas';
+    el('#p_name').value = '';
+    el('#p_desc').value = '';
+    el('#p_sort').value = '';
+    el('#p_active').value = '1';
+    el('#pp_p').value = '';
+    el('#pp_m').value = '';
+    el('#pp_g').value = '';
+    el('#pp_gg').value = '';
+    el('#p_price').value = '';
+    el('#p_img').value = '';
+    el('#btnCreate').classList.remove('hidden');
+    el('#btnSave').classList.add('hidden');
+    el('#btnCancel').classList.add('hidden');
+    syncPriceBoxes();
+  };
+
+  const loadToForm = (p) => {
+    editingId = p.id;
+    el('#edit_id').value = p.id;
+    el('#editBadge').textContent = 'Modo: Edição';
+    el('#p_type').value = p.type || 'outros';
+    el('#p_cat').value = p.cat || '';
+    el('#p_name').value = p.name || '';
+    el('#p_desc').value = p.desc || '';
+    el('#p_sort').value = String(p.sort ?? '');
+    el('#p_active').value = String(p.active ? 1 : 0);
+
+    if(p.type==='pizza'){
+      el('#pp_p').value = String(p.prices?.P ?? '');
+      el('#pp_m').value = String(p.prices?.M ?? '');
+      el('#pp_g').value = String(p.prices?.G ?? '');
+      el('#pp_gg').value = String(p.prices?.GG ?? '');
+    } else {
+      el('#p_price').value = String(p.base ?? '');
+    }
+
+    el('#p_img').value = '';
+    el('#btnCreate').classList.add('hidden');
+    el('#btnSave').classList.remove('hidden');
+    el('#btnCancel').classList.remove('hidden');
+    syncPriceBoxes();
+    toast('Produto carregado para edição ✏️');
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+
+  const readForm = async () => {
+    const type = el('#p_type').value;
+    const cat = (el('#p_cat').value||'').trim() || 'Outros';
+    const name = (el('#p_name').value||'').trim();
+    const desc = (el('#p_desc').value||'').trim();
+    const sort = Number(el('#p_sort').value||999);
+    const active = Number(el('#p_active').value||1);
+
+    if(!name) throw new Error('Informe o nome do produto.');
+
+    const file = el('#p_img').files?.[0];
+    let imgData = '';
+    if(file){
+      imgData = await fileToDataURL(file);
+    }
+
+    const obj = { type, cat, name, desc, sort, active };
+    if(imgData) obj.imgData = imgData;
+
+    if(type==='pizza'){
+      const P = Number(String(el('#pp_p').value||0).replace(',','.'))||0;
+      const M = Number(String(el('#pp_m').value||0).replace(',','.'))||0;
+      const G = Number(String(el('#pp_g').value||0).replace(',','.'))||0;
+      const GG = Number(String(el('#pp_gg').value||0).replace(',','.'))||0;
+      obj.prices = {P,M,G,GG};
+    } else {
+      const base = Number(String(el('#p_price').value||0).replace(',','.'))||0;
+      obj.base = base;
+    }
+    return obj;
+  };
+
+  el('#btnCancel').addEventListener('click', resetForm);
+
+  el('#btnCreate').addEventListener('click', async ()=>{
+    try{
+      const obj = await readForm();
+      const id = uid();
+      const prod = {
+        id,
+        ...obj,
+        imgUrl: (obj.type==='pizza') ? IMG.pizza : (obj.type==='bebida' ? IMG.soda : IMG.esfirra),
+      };
+      if(obj.type!=='pizza' && prod.base==null) prod.base = 0;
+      if(obj.type==='pizza' && !prod.prices) prod.prices = {P:0,M:0,G:0,GG:0};
+      state.products.push(prod);
+      save();
+      renderAdminProducts();
+      renderMenu();
+      resetForm();
+      toast('Produto cadastrado ✅');
+    }catch(err){
+      toast(err?.message || 'Erro ao cadastrar.');
+    }
+  });
+
+  el('#btnSave').addEventListener('click', async ()=>{
+    try{
+      if(!editingId) throw new Error('Nenhum produto em edição.');
+      const idx = state.products.findIndex(p=>p.id===editingId);
+      if(idx<0) throw new Error('Produto não encontrado.');
+      const obj = await readForm();
+      const prev = state.products[idx];
+
+      state.products[idx] = {
+        ...prev,
+        ...obj,
+        imgUrl: prev.imgUrl,
+        imgData: obj.imgData ? obj.imgData : prev.imgData
+      };
+      save();
+      renderAdminProducts();
+      renderMenu();
+      resetForm();
+      toast('Alterações salvas ✅');
+    }catch(err){
+      toast(err?.message || 'Erro ao salvar.');
+    }
+  });
+
+  const renderAdminProducts = () => {
+    const aq = (el('#aq').value||'').trim().toLowerCase();
+    const list = state.products
+      .filter(p => {
+        if(!aq) return true;
+        const hay = `${p.name} ${p.desc} ${p.cat} ${p.type}`.toLowerCase();
+        return hay.includes(aq);
+      })
+      .sort((a,b)=> (Number(a.sort||9999)-Number(b.sort||9999)) || a.name.localeCompare(b.name));
+
+    const box = el('#adminList');
+    box.innerHTML = '';
+
+    if(list.length===0){
+      box.innerHTML = `<div class="hint" style="grid-column:1/-1">Nenhum produto encontrado.</div>`;
+      return;
+    }
+
+    for(const p of list){
+      const card = document.createElement('div');
+      card.className = 'prod';
+
+      const pr = p.type==='pizza'
+        ? `P ${BRL(p.prices?.P||0)} • M ${BRL(p.prices?.M||0)} • G ${BRL(p.prices?.G||0)} • GG ${BRL(p.prices?.GG||0)}`
+        : BRL(Number(p.base||0));
+
+      card.innerHTML = `
+        <div class="img"><img alt="${escapeAttr(p.name)}" src="${escapeAttr(guessImg(p))}"></div>
+        <div class="pbd">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+            <div>
+              <h3>${escapeHtml(p.name)}</h3>
+              <div class="mini">${escapeHtml(p.type)} • ${escapeHtml(p.cat||'Outros')} • Ordem: ${escapeHtml(String(p.sort||''))}</div>
+              <div class="mini">${escapeHtml(pr)}</div>
+            </div>
+            <span class="badge">${p.active? 'Ativo' : 'Pausado'}</span>
+          </div>
+          <p>${escapeHtml(p.desc||'')}</p>
+          <div class="row" style="flex-wrap:wrap">
+            <button class="btn" data-tog="${p.id}">${p.active? '⏸ Pausar' : '▶️ Ativar'}</button>
+            <button class="btn" data-edit="${p.id}">✏️ Editar</button>
+            <button class="btn danger" data-del="${p.id}">🗑 Excluir</button>
+          </div>
+        </div>
+      `;
+      box.appendChild(card);
+    }
+
+    box.querySelectorAll('[data-tog]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-tog');
+        const p = state.products.find(x=>x.id===id);
+        if(!p) return;
+        p.active = p.active?0:1;
+        save(); renderAdminProducts(); renderMenu();
+      });
+    });
+
+    box.querySelectorAll('[data-del]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-del');
+        const p = state.products.find(x=>x.id===id);
+        if(!p) return;
+        if(confirm(`Excluir "${p.name}"?`)){
+          state.products = state.products.filter(x=>x.id!==id);
+          state.cart = state.cart.filter(x=>x.productId!==id && x.opts?.halfId!==id);
+          if(editingId===id) resetForm();
+          save(); renderAdminProducts(); renderMenu(); renderCartBadge();
+        }
+      });
+    });
+
+    box.querySelectorAll('[data-edit]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.getAttribute('data-edit');
+        const p = state.products.find(x=>x.id===id);
+        if(!p) return;
+        loadToForm(p);
+      });
+    });
+  };
+
+  const renderAdmin = () => {
+    el('#a_title').value = state.store.title || '';
+    el('#a_subtitle').value = state.store.subtitle || '';
+    el('#a_wa').value = state.store.wa || '';
+    el('#a_greet').value = state.store.greet || '';
+    el('#a_min').value = Number(state.store.minOrder||0);
+    el('#a_delMode').value = state.store.delivery.mode || 'fixed';
+    el('#a_delFixed').value = Number(state.store.delivery.fixedFee||0);
+    el('#a_open').value = state.store.hours.open || '18:00';
+    el('#a_close').value = state.store.hours.close || '23:00';
+    el('#a_allowClosed').value = String(state.store.hours.allowClosed||0);
+    renderBairros();
+    renderAdminProducts();
+    if(!editingId) resetForm();
+  };
+
+  el('#aq').addEventListener('input', renderAdminProducts);
+
+  el('#saveStore').addEventListener('click', ()=>{
+    state.store.title = el('#a_title').value.trim() || defaults.store.title;
+    state.store.subtitle = el('#a_subtitle').value.trim() || defaults.store.subtitle;
+    state.store.wa = el('#a_wa').value.replace(/\D/g,'');
+    state.store.greet = el('#a_greet').value.trim() || defaults.store.greet;
+    state.store.minOrder = Number(el('#a_min').value||0);
+    state.store.delivery.mode = el('#a_delMode').value;
+    state.store.delivery.fixedFee = Number(el('#a_delFixed').value||0);
+    state.store.hours.open = el('#a_open').value || '18:00';
+    state.store.hours.close = el('#a_close').value || '23:00';
+    state.store.hours.allowClosed = Number(el('#a_allowClosed').value||0);
+    save();
+    renderMenu(); renderCart();
+    toast('Configurações salvas ✅');
+  });
+
+  el('#addBairro').addEventListener('click', ()=>{
+    const name = (el('#b_name').value||'').trim();
+    const fee = Number(el('#b_fee').value||0);
+    if(!name) return toast('Digite o nome do bairro.');
+    state.store.delivery.bairros.push({id: uid(), name, fee});
+    el('#b_name').value=''; el('#b_fee').value='';
+    save(); renderBairros(); syncDeliveryUI();
+    toast('Bairro adicionado ✅');
+  });
+
+  el('#resetAll').addEventListener('click', ()=>{
+    if(confirm('Isso vai resetar tudo para o padrão (Falcão Pizza). Continuar?')){
+      state = structuredClone(defaults);
+      save();
+      activeCat = 'Todos';
+      resetForm();
+      renderMenu(); renderCart(); renderAdmin();
+      toast('Reset completo ✅');
+    }
+  });
+
+  el('#exportData').addEventListener('click', ()=>{
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'falcao-pizza-backup.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  el('#importFile').addEventListener('change', async (ev)=>{
+    const f = ev.target.files?.[0];
+    if(!f) return;
+    try{
+      const txt = await f.text();
+      const data = JSON.parse(txt);
+      state = normalizeLoaded(data);
+      save();
+      activeCat = 'Todos';
+      resetForm();
+      renderMenu(); renderCart(); renderAdmin();
+      toast('Backup importado ✅');
+    }catch(e){
+      toast('Falha ao importar. Verifique o arquivo.');
+    }finally{
+      ev.target.value = '';
+    }
+  });
+
+  el('#openClient').addEventListener('click', ()=> { goTab('menu'); toast('Menu do cliente aberto ✅'); });
+
+  syncDeliveryUI();
+  renderMenu();
+  renderCartBadge();
+})();
+</script>
+</body>
+</html>
